@@ -6,10 +6,17 @@ export class MinaAddresses{
     o1labsAddresses: string;
     investorsAddresses: string;
 
-    public constructor(pathToMina-Addresses: string){
-        this.foundationAddresses = fs.readFile(path.join(pathToMina-Addresses, 'foundationAddresses.txt'), 'utf8');
-        this.investorsAddresses = fs.readFile(path.join(pathToMina-Addresses, 'investorsAddresses.txt'), 'utf8');
-        this.o1labsAddresses = fs.readFile(path.join(pathToMina-Addresses, 'labsAddresses.txt'), 'utf8');
+    private constructor(foundationAddresses: string, o1labsAddresses: string, investorsAddresses: string) {
+        this.foundationAddresses = foundationAddresses;
+        this.o1labsAddresses = o1labsAddresses;
+        this.investorsAddresses = investorsAddresses;
+    }
+
+    public static async create(pathToMinaAddresses: string): Promise<MinaAddresses> {
+        const foundationAddresses = await fs.readFile(path.join(pathToMinaAddresses, 'Mina_Foundation_Addresses.csv'), 'utf8');
+        const o1labsAddresses = await fs.readFile(path.join(pathToMinaAddresses, 'O1_Labs_Addresses.csv'), 'utf8');
+        const investorsAddresses = await fs.readFile(path.join(pathToMinaAddresses, 'Investors_Addresses.csv'), 'utf8');
+        return new MinaAddresses(foundationAddresses, o1labsAddresses, investorsAddresses);
     }
 
     public async getPublicKeyShareClass(key: string): Promise<ShareClass> {    
@@ -23,9 +30,10 @@ export class MinaAddresses{
         } else {
             return { shareClass: 'Common', shareOwner: '' };
         }
-    } catch (error) {
-        console.error('Error:', error);
-        throw error;
+        } catch (error) {
+            console.error('Error:', error);
+            throw error;
+        }
     }
 }
 
