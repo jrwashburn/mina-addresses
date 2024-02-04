@@ -1,29 +1,32 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
-export async function getPublicKeyShareClass(key: string): Promise<ShareClass> {
-  const foundationAddressesFile = path.join('Mina_Foundation_Addresses.csv');
-  const labsAddressesFile = path.join('O1_Labs_Addresses.csv');
-  const investorsAddressesFile = path.join('./', 'Investors_Addresses.csv');
+export class MinaAddresses{
+    foundationAddresses: string;
+    o1labsAddresses: string;
+    investorsAddresses: string;
 
-  try {
-      const foundationAddresses = await fs.readFile(foundationAddressesFile, 'utf8');
-      const o1labsAddresses = await fs.readFile(labsAddressesFile, 'utf8');
-      const investorsAddresses = await fs.readFile(investorsAddressesFile, 'utf8');
+    public constructor(pathToMina-Addresses: string){
+        this.foundationAddresses = fs.readFile(path.join(pathToMina-Addresses, 'foundationAddresses.txt'), 'utf8');
+        this.investorsAddresses = fs.readFile(path.join(pathToMina-Addresses, 'investorsAddresses.txt'), 'utf8');
+        this.o1labsAddresses = fs.readFile(path.join(pathToMina-Addresses, 'labsAddresses.txt'), 'utf8');
+    }
 
-      if (foundationAddresses.includes(key)) {
-          return { shareClass: 'NPS', shareOwner: 'MF' };
-      } else if (o1labsAddresses.includes(key)) {
-          return { shareClass: 'NPS', shareOwner: 'O1' };
-      } else if (investorsAddresses.includes(key)) {
-          return { shareClass: 'NPS', shareOwner: 'INVEST' };
-      } else {
-          return { shareClass: 'Common', shareOwner: '' };
-      }
-  } catch (error) {
-      console.error('Error:', error);
-      throw error; 
-  }
+    public async getPublicKeyShareClass(key: string): Promise<ShareClass> {    
+    try {
+        if (this.foundationAddresses.includes(key)) {
+            return { shareClass: 'NPS', shareOwner: 'MF' };
+        } else if (this.o1labsAddresses.includes(key)) {
+            return { shareClass: 'NPS', shareOwner: 'O1' };
+        } else if (this.investorsAddresses.includes(key)) {
+            return { shareClass: 'NPS', shareOwner: 'INVEST' };
+        } else {
+            return { shareClass: 'Common', shareOwner: '' };
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
 }
 
 export type ShareClass = { shareClass: 'NPS' | 'Common' | 'BURN'; shareOwner: '' | 'MF' | 'O1' | 'INVEST' | 'BURN' };
